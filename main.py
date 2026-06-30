@@ -22,12 +22,17 @@ def create_prediction(coin: str, direction: str, minutes: int):
     db = SessionLocal()
 
     try:
-        start_price = float(
-            requests.get(
-                f"https://api.binance.com/api/v3/ticker/price?symbol={coin}"
-            ).json()["price"]
-        )
+       response = requests.get(
+    f"https://api.binance.com/api/v3/ticker/price?symbol={coin.upper()}"
+).json()
 
+if "price" not in response:
+    return {
+        "error": "Invalid coin symbol or Binance API returned an error.",
+        "response": response
+    }
+
+start_price = float(response["price"])
         end_time = datetime.utcnow() + timedelta(minutes=minutes)
 
         prediction = Prediction(
